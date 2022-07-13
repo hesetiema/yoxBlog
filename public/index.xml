@@ -14,9 +14,9 @@
       
       <guid>https://wuyox.vercel.app/posts/secondpost/</guid>
       <description>个人部分翻译 《Understanding ECMAScript 6》 文章的中部部分如下。
-扩展的对象功能 Object.is() 方法 ES6 引入了 Object.is() 方法来弥补严格相等运算符残留的怪异缺陷。在许多情况下，Object.is() 与 === 运算符的工作方式相同。 唯一的区别是 +0 和 -0 被认为是不等价的，而 NaN 被认为与 NaN 等价。
+扩展的对象功能 Object.is() 方法 ES6 引入了 Object.is() 方法来弥补严格相等运算符残留的怪异缺陷。在许多情况下，=== 与 Object.is() 运算符的工作方式相同，其对应的相等比较算法分别为 IsStrictlyEqual 和 SameValue。 对于后者，+0 和 -0 被认为是不等价的，而 NaN 被认为与 NaN 等价。
 自有属性的枚举顺序 对象自有属性枚举时，整数属性会优先被进行排序，其他属性则按照创建的顺序显示。
-let codes = { 49: &amp;#34;Germany&amp;#34;, 41: &amp;#34;Switzerland&amp;#34;, 44: &amp;#34;Great Britain&amp;#34;, string02: &amp;#34;string2&amp;#34;, string01: &amp;#34;string1&amp;#34;, 1.2: &amp;#34;1.2&amp;#34;, &amp;#34;1.0&amp;#34;: &amp;#34;1.0&amp;#34;, // .., 1: &amp;#34;USA&amp;#34;, }; for (let code in codes) { console.log(code); // 1, 41, 44, 49 ,string02, string01, 1.2, 1.0 } 更强大的原型 修改对象的原型：Object.setPrototypeOf() 方法允许修改任意指定对象的原型，它接受两个参数：需要被修改原型的对象，以及将会成为前者原型的对象 使用 super 引用原型：super 可理解为指向当前对象的原型的一个指针 const obj1 = { method1() { console.</description>
+let codes = { 49: &amp;#34;Germany&amp;#34;, 41: &amp;#34;Switzerland&amp;#34;, 44: &amp;#34;Great Britain&amp;#34;, string02: &amp;#34;string2&amp;#34;, string01: &amp;#34;string1&amp;#34;, 1.2: &amp;#34;1.2&amp;#34;, &amp;#34;1.0&amp;#34;: &amp;#34;1.0&amp;#34;, // .., 1: &amp;#34;USA&amp;#34;, }; for (let code in codes) { console.log(code); // 1, 41, 44, 49 ,string02, string01, 1.2, 1.0 } 更强大的原型 修改对象的原型：Object.</description>
     </item>
     
     <item>

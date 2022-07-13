@@ -10,7 +10,7 @@ draft: false
 
 ### `Object.is()` 方法
 
-`ES6` 引入了 `Object.is()` 方法来弥补严格相等运算符残留的怪异缺陷。在许多情况下，`Object.is()` 与 `===` 运算符的工作方式相同。 唯一的区别是 `+0` 和 `-0` 被认为是不等价的，而 `NaN` 被认为与 `NaN` 等价。
+`ES6` 引入了 `Object.is()` 方法来弥补严格相等运算符残留的怪异缺陷。在许多情况下，`===`   与 `Object.is()` 运算符的工作方式相同，其对应的相等比较算法分别为 `IsStrictlyEqual` 和 `SameValue`。 对于后者，`+0` 和 `-0` 被认为是不等价的，而 `NaN` 被认为与 `NaN` 等价。
 
 ### 自有属性的枚举顺序
 
@@ -141,14 +141,24 @@ let user = {
 
 ### Map
 
-`Map` 是一组键值对的有序集合，而键和值都可以是任意类型。通常可以使用对象作为键
+`Map` 是一组键值对的有序集合，`Map` 实例会维护键值对的插入顺序，而键和值都可以是任意类型。通常可以使用对象作为键。
 
 ### WeakMap
 
 `WeakMap` 是类似于 `Map` 的集合，它仅允许对象作为键，并且一旦通过其他方式无法访问这些对象，垃圾回收便会将这些对象与其关联值一同删除。其他特性与 `WeakSet` 一样。必须注意的是，`WeakMap` 的键才是弱引用，而值不是。在 `WeakMap` 的值中存储对象，就算该对象的其他引用已全都被移除，也会阻止垃圾回收
+
+## 注解
+
+### Javascript 相等比较算法
+
+> - `IsLooselyEqual (==)`：宽松相等
+> - `IsStrictlyEqual (===)`: 严格相等。通常用于 `Array.prototype.indexOf`, `Array.prototype.lastIndexOf` 和 `case-matching`
+> - `SameValueZero`: 同值为零比较。常用于 `%TypedArray%` 和 `ArrayBuffer` 构造函数、以及 `Map`、`Set`、`String.prototype.includes`
+> - `SameValue (Object.is)`: 同值比较。用于所有其他地方
 
 ## 参考资料
 
 - [Object (对象) ：基础知识](https://zh.javascript.info/object)
 - [Symbol MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol)
 - [Map and Set（映射和集合）](https://zh.javascript.info/map-set)
+- [JavaScript 中的相等性判断](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Equality_comparisons_and_sameness)
