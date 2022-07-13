@@ -1,4 +1,6 @@
-baseURL: http://example.org/
+baseURL: https://wuyox.vercel.app/
 languageCode: en-us
 title: My New Hugo Site
 theme: "PaperMod"
+minify:
+  disableXML: true

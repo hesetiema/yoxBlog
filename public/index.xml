@@ -2,20 +2,32 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>My New Hugo Site</title>
-    <link>http://example.org/</link>
+    <link>https://wuyox.vercel.app/</link>
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 11 Jul 2022 16:53:19 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Jul 2022 09:42:53 +0800</lastBuildDate><atom:link href="https://wuyox.vercel.app/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>译《Understanding ECMAScript 6》中</title>
+      <link>https://wuyox.vercel.app/posts/secondpost/</link>
+      <pubDate>Wed, 13 Jul 2022 09:42:53 +0800</pubDate>
+      
+      <guid>https://wuyox.vercel.app/posts/secondpost/</guid>
+      <description>个人部分翻译 《Understanding ECMAScript 6》 文章的中部部分如下。
+扩展的对象功能 Object.is() 方法 ES6 引入了 Object.is() 方法来弥补严格相等运算符残留的怪异缺陷。在许多情况下，Object.is() 与 === 运算符的工作方式相同。 唯一的区别是 +0 和 -0 被认为是不等价的，而 NaN 被认为与 NaN 等价。
+自有属性的枚举顺序 对象自有属性枚举时，整数属性会优先被进行排序，其他属性则按照创建的顺序显示。
+let codes = { 49: &amp;#34;Germany&amp;#34;, 41: &amp;#34;Switzerland&amp;#34;, 44: &amp;#34;Great Britain&amp;#34;, string02: &amp;#34;string2&amp;#34;, string01: &amp;#34;string1&amp;#34;, 1.2: &amp;#34;1.2&amp;#34;, &amp;#34;1.0&amp;#34;: &amp;#34;1.0&amp;#34;, // .., 1: &amp;#34;USA&amp;#34;, }; for (let code in codes) { console.log(code); // 1, 41, 44, 49 ,string02, string01, 1.2, 1.0 } 更强大的原型 修改对象的原型：Object.setPrototypeOf() 方法允许修改任意指定对象的原型，它接受两个参数：需要被修改原型的对象，以及将会成为前者原型的对象 使用 super 引用原型：super 可理解为指向当前对象的原型的一个指针 const obj1 = { method1() { console.</description>
+    </item>
+    
     <item>
       <title>译《Understanding ECMAScript 6》上</title>
-      <link>http://example.org/posts/firstpost/</link>
+      <link>https://wuyox.vercel.app/posts/firstpost/</link>
       <pubDate>Mon, 11 Jul 2022 16:53:19 +0800</pubDate>
       
-      <guid>http://example.org/posts/firstpost/</guid>
+      <guid>https://wuyox.vercel.app/posts/firstpost/</guid>
       <description>个人部分翻译 《Understanding ECMAScript 6》 文章的上半部分如下。
-概述 本书的 13 章中的每一章都涵盖了 ECMAScript 6 的不同方面。许多章节都从讨论 ECMAScript 6 更改所要解决的问题开始
-let, const 的块绑定，var 的块级替换 字符串、正则表达式、模板字符串 箭头函数、默认参数、剩余参数等 对象字面量的更改、新的反射方法 对象和数组解构 Symbols 和 Symbol 属性 Sets、Maps 集合类型 Iterators 迭代器、Generators 生成器 Class 类 数组的新方法 Promise 和异步编程 Proxy 代理、Reflection 反射 模块定义格式 一、块绑定 声明提升 vs 暂时性死区：var声明的变量存在声明提升，而let, const 的块绑定引入词法作用域 (块级作用域)，即在给定块范围之外无法访问变量的声明，若强制访问，则将触发暂时性死区(TDZ)导致错误。 循环最后迭代访问 vs 循环当前迭代访问 ：对于 let ，for-in 和 for-of 循 ​ 环都会在循环的每次迭代中创建一个新的绑定。这意味着在循环体内创建的函数可以在当前迭代期间访问循环绑定值，而不是在循环的最终迭代之后（使用 var 的行为） 最佳实践：默认使用 const 且仅在变量的值需更改时才使用 let 二、字符串与正则表达式 代理对：Unicode 中的表情符号等具有非常高的码位值，因此无法存储在两个字节（16 位）中，需要将它们编码为两个 UTF-16 字符（4 个字节），这些被称为代理对</description>
+概述 本书的 13 章中的每一章都涵盖了 ECMAScript 6 的不同方面。许多章节都从讨论 ECMAScript 6 更改所要解决的问题开始。上半部分仅讨论前三节。
+let, const 的块绑定，var 的块级替换 字符串、正则表达式、模板字符串 箭头函数、默认参数、剩余参数等 对象字面量的更改、新的反射方法 对象和数组解构 Symbols 和 Symbol 属性 Sets、Maps 集合类型 Iterators 迭代器、Generators 生成器 Class 类 数组的新方法 Promise 和异步编程 Proxy 代理、Reflection 反射 模块定义格式 一、块绑定 声明提升 vs 暂时性死区：var声明的变量存在声明提升，而let, const 的块绑定引入词法作用域 (块级作用域)，即在给定块范围之外无法访问变量的声明，若强制访问，则将触发暂时性死区(TDZ)导致错误。 循环最后迭代访问 vs 循环当前迭代访问 ：对于 let ，for-in 和 for-of 循环都会在循环的每次迭代中创建一个新的绑定。这意味着在循环体内创建的函数可以在当前迭代期间访问循环绑定值，而不是在循环的最终迭代之后（使用 var 的行为） 最佳实践：默认使用 const 且仅在变量的值需更改时才使用 let 二、字符串与正则表达式 代理对：Unicode 中的表情符号等具有非常高的码位值，因此无法存储在两个字节（16 位）中，需要将它们编码为两个 UTF-16 字符（4 个字节），这些被称为代理对</description>
     </item>
     
   </channel>
