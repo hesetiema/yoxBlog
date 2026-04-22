@@ -1,0 +1,12 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" fill="#F3E6D6"/>
+  <circle cx="970" cy="130" r="170" fill="#D98A5D" fill-opacity="0.42"/>
+  <circle cx="248" cy="624" r="236" fill="#7A8F86" fill-opacity="0.22"/>
+  <rect x="68" y="66" width="1064" height="588" rx="36" fill="#FFF8EF" stroke="#B45A3F" stroke-opacity="0.28" stroke-width="2"/>
+  <path d="M155 523C269 392 390 325 508 325C632 325 708 400 818 400C894 400 961 369 1028 296" stroke="#9B432C" stroke-width="14" stroke-linecap="round"/>
+  <path d="M155 573C250 475 330 426 446 426C562 426 624 484 747 484C837 484 917 446 1048 345" stroke="#D7A06D" stroke-width="9" stroke-linecap="round"/>
+  <text x="140" y="210" fill="#7B3728" font-size="28" font-family="Manrope, sans-serif" letter-spacing="10">YOXWU BLOG</text>
+  <text x="136" y="330" fill="#20180F" font-size="100" font-family="Cormorant Garamond, serif" font-weight="700">Understanding</text>
+  <text x="136" y="420" fill="#20180F" font-size="100" font-family="Cormorant Garamond, serif" font-weight="700">ECMAScript 6</text>
+  <text x="140" y="490" fill="#6A5F51" font-size="34" font-family="Manrope, sans-serif">上篇 · 块绑定 / 字符串扩展 / 函数形态</text>
+</svg>

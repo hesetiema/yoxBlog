@@ -1,0 +1,247 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Layout title={`${post.data.title} | Yoxwu Blog`} description={post.data.description}>
+  <main class="page">
+    <article class="post">
+      <a class="back-link" href="/">返回首页</a>
+
+      <header class="post-hero">
+        <div class="post-copy">
+          <p class="post-date">{post.data.date.toLocaleDateString('zh-CN')}</p>
+          <p class="post-meta">{post.data.author}{post.data.series ? ` / ${post.data.series}` : ''}</p>
+          <h1>{post.data.title}</h1>
+          <p class="post-description">{post.data.description}</p>
+          {post.data.updatedAt && (
+            <p class="post-updated">最近更新于 {post.data.updatedAt.toLocaleDateString('zh-CN')}</p>
+          )}
+          <ul class="tag-list" aria-label="文章标签">
+            {post.data.tags.map((tag) => <li><a href={`/tags/${encodeURIComponent(tag)}`}>{tag}</a></li>)}
+          </ul>
+        </div>
+        <img class="post-cover" src={post.data.cover} alt={post.data.title} />
+      </header>
+
+      <div class="post-content prose">
+        <Content />
+      </div>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    position: relative;
+    z-index: 1;
+  }
+
+  .post {
+    display: grid;
+    gap: 24px;
+  }
+
+  .back-link {
+    justify-self: start;
+    padding-bottom: 4px;
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .post-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.9fr);
+    gap: 28px;
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 34px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  .post-copy {
+    display: grid;
+    gap: 18px;
+  }
+
+  .post-date,
+  .post-description {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .post-meta,
+  .post-updated {
+    margin: 0;
+    color: var(--accent-deep);
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 4.8rem);
+    line-height: 0.95;
+    font-weight: 700;
+  }
+
+  .post-description {
+    line-height: 1.8;
+    font-size: 1.02rem;
+  }
+
+  .post-cover {
+    display: block;
+    width: 100%;
+    border-radius: 24px;
+    object-fit: cover;
+    box-shadow: 0 16px 32px rgba(32, 24, 15, 0.12);
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tag-list li {
+    padding: 0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .tag-list a {
+    display: inline-flex;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(165, 72, 47, 0.08);
+    color: var(--accent);
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .post-content {
+    max-width: 820px;
+    padding: 36px;
+    border-radius: 32px;
+    background: var(--paper-strong);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .prose :global(*) {
+    box-sizing: border-box;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4) {
+    margin: 2.3rem 0 1rem;
+    font-family: 'Cormorant Garamond', serif;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+
+  .prose :global(h2) {
+    font-size: 2.4rem;
+  }
+
+  .prose :global(h3) {
+    font-size: 1.9rem;
+  }
+
+  .prose :global(p),
+  .prose :global(li),
+  .prose :global(blockquote) {
+    font-size: 1.04rem;
+    line-height: 1.9;
+    color: #31281d;
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol),
+  .prose :global(blockquote),
+  .prose :global(pre) {
+    margin: 0 0 1.25rem;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+  }
+
+  .prose :global(blockquote) {
+    margin-left: 0;
+    padding: 18px 20px;
+    border-left: 4px solid var(--accent-soft);
+    background: rgba(227, 163, 108, 0.12);
+    border-radius: 0 20px 20px 0;
+  }
+
+  .prose :global(code) {
+    padding: 0.16rem 0.4rem;
+    border-radius: 0.5rem;
+    background: rgba(95, 122, 114, 0.12);
+    font-size: 0.94em;
+  }
+
+  .prose :global(pre) {
+    overflow-x: auto;
+    padding: 20px;
+    border-radius: 24px;
+    background: #201913;
+    color: #f8efe6;
+  }
+
+  .prose :global(pre code) {
+    padding: 0;
+    background: transparent;
+    color: inherit;
+  }
+
+  @media (max-width: 920px) {
+    .post-hero {
+      grid-template-columns: 1fr;
+    }
+
+    .post-content {
+      padding: 24px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .post-hero {
+      padding: 20px;
+      border-radius: 28px;
+    }
+
+    h1 {
+      font-size: 2.6rem;
+    }
+
+    .prose :global(h2) {
+      font-size: 2rem;
+    }
+  }
+</style>
