@@ -7,12 +7,17 @@
  * 发现缺字就重跑一次子集；重跑失败（没装 python/fonttools）只报警、不阻断构建。
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { collectChars, root } from './font-charset.mjs';
 
 const charsetFile = join(root, '.cache', 'fonts', 'charset.txt');
-const outFile = join(root, 'public', 'fonts', 'lxgw-wenkai-400.woff2');
+const fontDir = join(root, 'public', 'fonts');
+
+/** 字体文件名带内容指纹，这里按前缀找当前那一份 */
+const fontFiles = existsSync(fontDir)
+	? readdirSync(fontDir).filter((name) => /^lxgw-wenkai-400(\.[0-9a-z]+)?\.woff2$/.test(name))
+	: [];
 
 const next = new Set(collectChars());
 
@@ -23,7 +28,7 @@ const preview = (chars) => {
 };
 
 let reason = '';
-if (!existsSync(outFile)) {
+if (fontFiles.length === 0) {
 	reason = '字体文件不存在';
 } else if (!existsSync(charsetFile)) {
 	// CI（Vercel 等）只拉仓库，.cache 不在版本库里，也没有 python 环境：

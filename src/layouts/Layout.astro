@@ -1,4 +1,6 @@
 ---
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import '../styles/global.css';
 
 interface Props {
@@ -27,6 +29,23 @@ const navItems = [
 	{ label: '生活', href: '/category/life' },
 	{ label: '思考', href: '/category/thoughts' },
 ];
+
+/*
+	字体文件名带内容指纹（scripts/subset-font.mjs 生成），这里在构建时读目录拿到真实文件名。
+	指纹化之后字体可以配 immutable 长缓存：字符集不变就一直命中缓存，变了就自动换 URL。
+*/
+// 用 cwd 而不是 import.meta.url：构建后组件被编译进 dist/.prerender/chunks，相对路径会算错
+const fontDir = join(process.cwd(), 'public', 'fonts');
+const fontFile = existsSync(fontDir)
+	? readdirSync(fontDir).find((name) => /^lxgw-wenkai-400(\.[0-9a-z]+)?\.woff2$/.test(name))
+	: undefined;
+
+if (!fontFile) {
+	throw new Error('public/fonts 下找不到字体子集，先运行 pnpm fonts 生成');
+}
+
+const fontHref = `/fonts/${fontFile}`;
+const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font-weight:400;font-display:optional;src:url('${fontHref}') format('woff2');}`;
 ---
 
 <!doctype html>
@@ -55,16 +74,8 @@ const navItems = [
 			2. font-display: optional —— 字体没赶上首帧就整页用回退体，绝不"先画一遍再换字"。
 			   用 swap 时网络一慢就是整页重排（每行断行都会变），那就是肉眼看到的闪动。
 		-->
-		<style is:inline>
-			@font-face {
-				font-family: 'LXGW WenKai';
-				font-style: normal;
-				font-weight: 400;
-				font-display: optional;
-				src: url('/fonts/lxgw-wenkai-400.woff2') format('woff2');
-			}
-		</style>
-		<link rel="preload" href="/fonts/lxgw-wenkai-400.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={fontHref} as="font" type="font/woff2" crossorigin />
+		<style is:inline set:html={fontFaceCss}></style>
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />

@@ -10,14 +10,14 @@
  * 依赖：python + fonttools（python -m pip install fonttools brotli）
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { collectChars, root } from './font-charset.mjs';
 
 const cacheDir = join(root, '.cache', 'fonts');
 const sourceFont = join(cacheDir, 'LXGWWenKai-Regular.ttf');
 const outDir = join(root, 'public', 'fonts');
-const outFile = join(outDir, 'lxgw-wenkai-400.woff2');
 const charsetFile = join(cacheDir, 'charset.txt');
 
 /**
@@ -44,9 +44,24 @@ mkdirSync(outDir, { recursive: true });
 mkdirSync(dirname(charsetFile), { recursive: true });
 
 const charset = collectChars();
-mkdirSync(dirname(charsetFile), { recursive: true });
 writeFileSync(charsetFile, charset, 'utf8');
 console.log(`收集字符 ${[...charset].length} 个 → ${charsetFile}`);
+
+/*
+	文件名带内容指纹：字符集不变则文件名不变，变了就换一个新 URL。
+	这样字体可以放心配 immutable 长缓存，又不会出现「字体更新了、浏览器还在用旧缓存」。
+*/
+const hash = createHash('sha256').update(charset).digest('hex').slice(0, 8);
+const outFile = join(outDir, `lxgw-wenkai-400.${hash}.woff2`);
+
+// public/fonts 只留当前这一份，避免旧指纹文件在仓库里越积越多
+for (const name of readdirSync(outDir)) {
+	const stale = join(outDir, name);
+	if (/^lxgw-wenkai-400(\.[0-9a-z]+)?\.woff2$/.test(name) && stale !== outFile) {
+		unlinkSync(stale);
+		console.log(`删除旧字体 ${name}`);
+	}
+}
 
 execFileSync(
 	'python',
