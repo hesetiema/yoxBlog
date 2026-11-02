@@ -7,8 +7,30 @@ import react from "@astrojs/react";
 
 import solidJs from "@astrojs/solid-js";
 
+import sitemap from "@astrojs/sitemap";
+
+/** 站点根地址：canonical、og:url、RSS、sitemap 都基于它，换成真实域名即可 */
+const SITE = "https://yoxwu.com";
+
 // https://astro.build/config
 export default defineConfig({
+  site: SITE,
+  // 预取站内链接，让页面切换更顺滑
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: "viewport",
+  },
+  markdown: {
+    shikiConfig: {
+      // 代码块跟随站点深浅色：只输出 --shiki-light / --shiki-dark 变量，
+      // 具体颜色交给 global.css 按 data-theme 决定，避免受系统深浅色影响
+      themes: {
+        light: "github-light-high-contrast",
+        dark: "github-dark-high-contrast",
+      },
+      defaultColor: false,
+    },
+  },
   // Enable many frameworks to support all different kinds of components.
   // No `include` is needed if you are only using a single JSX framework!
   integrations: [
@@ -18,6 +40,10 @@ export default defineConfig({
     }),
     solidJs({
       include: ["**/solid/*"],
+    }),
+    sitemap({
+      // 草稿不会生成页面，这里只是保险起见
+      filter: (page) => !page.includes("/draft/"),
     }),
   ],
 });

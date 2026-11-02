@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+.gstack/
+
+# 本地临时调试目录
+.probe/
+
+# 字体子集化缓存（源字体 + 字符集）
+.cache/

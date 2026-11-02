@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../utils/post';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, description, date } = post.data;
+---
+
+<a class="card" href={`/posts/${post.id}`}>
+	<h2 class="card-title">{title}</h2>
+	<p class="card-summary">
+		<span class="card-date">【{formatDate(date)}】</span>{description}
+	</p>
+</a>
+
+<style>
+	/*
+		参考 tw93.fun：整块可点，hover 时整张卡的文字一起加深，不浮起、不加阴影。
+		标题和摘要都 color: inherit，所以只改 .card 一个颜色就能一起变，不会各变各的。
+	*/
+	.card {
+		display: block;
+		padding: 1.875rem 3.125rem 1.5rem;
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--ink-card);
+		transition: color 200ms var(--ease);
+	}
+
+	.card:hover {
+		color: var(--ink-strong);
+	}
+
+	.card-title,
+	.card-summary,
+	.card-date {
+		transition: color 200ms var(--ease);
+	}
+
+	.card-title {
+		margin: 0;
+		color: inherit;
+		font-size: clamp(1.25rem, 1rem + 1.1vw, 1.875rem);
+		line-height: 1.35;
+	}
+
+	.card-summary {
+		margin: 0.4rem 0 0;
+		color: inherit;
+		font-size: 1.0625rem;
+		line-height: 1.64;
+	}
+
+	.card-date {
+		margin-right: 0.3rem;
+		color: var(--muted);
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+		letter-spacing: -0.02em;
+	}
+
+	.card:hover .card-date {
+		color: var(--ink-soft);
+	}
+
+	@media (max-width: 640px) {
+		.card {
+			padding: 1.4rem 1.3rem 1.2rem;
+		}
+
+		.card-summary {
+			font-size: 0.9375rem;
+			line-height: 1.7;
+		}
+	}
+</style>

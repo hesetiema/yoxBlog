@@ -1,0 +1,122 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+	/** side：桌面右侧吸顶；inline：窄屏折叠在正文上方 */
+	variant?: 'side' | 'inline';
+}
+
+const { headings, variant = 'side' } = Astro.props;
+---
+
+{
+	variant === 'side' ? (
+		<aside class="toc" aria-label="目录">
+			<p class="toc-title">目录</p>
+			<ol class="toc-list">
+				{headings.map((heading) => (
+					<li class:list={['toc-item', `toc-item--h${heading.depth}`]}>
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					</li>
+				))}
+			</ol>
+		</aside>
+	) : (
+		<details class="toc-inline">
+			<summary>目录</summary>
+			<ol class="toc-list">
+				{headings.map((heading) => (
+					<li class:list={['toc-item', `toc-item--h${heading.depth}`]}>
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					</li>
+				))}
+			</ol>
+		</details>
+	)
+}
+
+<style>
+	/*
+		fixed 而不是 sticky：sticky 每帧都要按滚动位置重算位置、重绘这一列文字，
+		滚动时整块目录会抖；fixed 由合成器平移，滚动过程中完全不参与布局。
+		和顶部导航用的是同一套办法。
+		left 按「容器居中 + 内容宽 - 目录列宽」算：--width 是 .container 的最大宽度，
+		24px 是它的左右内边距，190px 是文章页给目录留的列宽（见 posts/[id].astro）。
+	*/
+	.toc {
+		position: fixed;
+		top: calc(var(--header-h) + 2.5rem);
+		left: calc(50% + (var(--width) - 48px) / 2 - 190px);
+		width: 190px;
+		max-height: calc(100vh - var(--header-h) - 5rem);
+		overflow-y: auto;
+		font-size: 0.8125rem;
+		line-height: 1.7;
+	}
+
+	.toc-title,
+	.summary {
+		margin: 0 0 0.6rem;
+		color: var(--muted);
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+	}
+
+	.toc-list,
+	.toc-inline ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.toc-item--h3 {
+		padding-left: 0.9rem;
+	}
+
+	.toc-item a {
+		display: block;
+		padding: 0.15rem 0;
+		color: var(--ink-soft);
+		transition: color 200ms var(--ease);
+	}
+
+	.toc-item a:hover {
+		color: var(--ink-strong);
+	}
+
+	/* 当前阅读到的位置（脚本按滚动位置切换），只改颜色不改字重，避免文字抖动 */
+	.toc-item a.is-active {
+		color: var(--ink-strong);
+	}
+
+	.toc-inline {
+		margin: 0 0 2rem;
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		padding: 0.6rem 0.9rem;
+		font-size: 0.8125rem;
+	}
+
+	.toc-inline summary {
+		cursor: pointer;
+		color: var(--muted);
+		letter-spacing: 0.08em;
+	}
+
+	.toc-inline .toc-list {
+		margin-top: 0.5rem;
+	}
+
+	@media (min-width: 1100px) {
+		.toc-inline {
+			display: none;
+		}
+	}
+
+	@media (max-width: 1099.98px) {
+		.toc {
+			display: none;
+		}
+	}
+</style>

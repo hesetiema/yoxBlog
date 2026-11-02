@@ -1,0 +1,460 @@
+/* ==========================================================================
+   Font —— @font-face 定义在 Layout.astro 的 <head> 内联样式中
+   （必须早于首帧生效；dev 环境里 external CSS 是 JS 注入的，会引起整页换字）
+   字体文件由 scripts/subset-font.mjs 生成：单个 woff2 覆盖全站字符
+   ========================================================================== */
+
+/* ==========================================================================
+   Tokens —— 极简：米白纸面 + 白卡 + 墨色文字，不用任何装饰性颜色
+   ========================================================================== */
+
+:root {
+	color-scheme: light;
+
+	/* 楷体正文：优先霞鹜文楷（开源），退回参考站点使用的同款回退链 */
+	--font-sans:
+		'LXGW WenKai', 'TsangerJinKai02', 'STKaiti', 'Kaiti SC', 'KaiTi', '楷体', -apple-system, BlinkMacSystemFont,
+		'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+	--bg: #f5f4ed;
+	--surface: #ffffff;
+	--ink: #24292f;
+	--ink-strong: #15141a;
+	--ink-soft: rgba(36, 41, 47, 0.88);
+	/* 卡片静止态：比正文略淡一档，hover 才有明显的加深空间 */
+	--ink-card: rgba(36, 41, 47, 0.8);
+	--muted: rgba(36, 41, 47, 0.52);
+	--line: #e6e3d9;
+	--line-strong: #d6d2c5;
+	/* 链接静止态的细下划线：比 --line-strong 更实一点，浅色/深色下都能看出"这里能点" */
+	--underline: rgba(36, 41, 47, 0.3);
+	--hover: rgba(36, 41, 47, 0.05);
+	--code-bg: #ffffff;
+	--code-border: #e2dfd4;
+
+	--radius: 8px;
+
+	--width: 900px;
+	--ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+	/* 固定头部高度：60px 内容 + 1px 分隔线，body 和锚点跳转都按这个让位 */
+	--header-h: 61px;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+
+	--bg: #161613;
+	--surface: #1e1e1b;
+	--ink: #eae7df;
+	--ink-strong: #ffffff;
+	--ink-soft: rgba(234, 231, 223, 0.86);
+	--ink-card: rgba(234, 231, 223, 0.8);
+	--muted: rgba(234, 231, 223, 0.46);
+	--line: #2d2c28;
+	--line-strong: #413f39;
+	--underline: rgba(234, 231, 223, 0.4);
+	--hover: rgba(255, 255, 255, 0.06);
+	--code-bg: #171613;
+	--code-border: #33312c;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	/* 不用 scroll-behavior: smooth：键盘翻页/锚点跳转会变成动画，观感发飘 */
+	scroll-padding-top: var(--header-h);
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: calc(100vh - var(--header-h));
+	margin: 0;
+	padding-top: var(--header-h);
+	background: var(--bg);
+	color: var(--ink-soft);
+	font-family: var(--font-sans);
+	font-size: 0.9375rem;
+	line-height: 1.64;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	color: var(--ink);
+	font-weight: 700;
+	line-height: 1.35;
+	letter-spacing: 0.02em;
+}
+
+p {
+	text-wrap: pretty;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+button {
+	font: inherit;
+	color: inherit;
+}
+
+::selection {
+	background: var(--ink);
+	color: var(--bg);
+}
+
+:focus-visible {
+	outline: 2px solid var(--ink);
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--line);
+	margin: 2.5rem 0;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.container {
+	width: 100%;
+	max-width: var(--width);
+	margin-inline: auto;
+	padding-inline: 24px;
+}
+
+.page {
+	display: grid;
+	gap: 1.75rem;
+	padding-block: 2.5rem 0;
+}
+
+.page-head {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.page-head h1 {
+	margin: 0;
+	font-size: clamp(1.5rem, 1rem + 1.4vw, 1.875rem);
+	line-height: 1.35;
+}
+
+.page-head p {
+	margin: 0;
+	color: var(--ink-soft);
+}
+
+.post-list {
+	display: grid;
+	gap: 2rem;
+}
+
+@media (max-width: 640px) {
+	.post-list {
+		gap: 1.25rem;
+	}
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ==========================================================================
+   Prose
+   ========================================================================== */
+
+.prose {
+	color: var(--ink-soft);
+	font-size: 1.0625rem;
+	line-height: 1.64;
+}
+
+.prose > :first-child {
+	margin-top: 0;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+	margin: 2.2em 0 0.75em;
+	line-height: 1.45;
+}
+
+.prose h2 {
+	font-size: 1.375rem;
+}
+
+.prose h3 {
+	font-size: 1.125rem;
+}
+
+.prose h4 {
+	font-size: 1rem;
+	color: var(--ink);
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose table,
+.prose pre,
+.prose figure {
+	margin: 0 0 1.3em;
+}
+
+.prose ul,
+.prose ol {
+	padding-left: 1.35em;
+}
+
+.prose li {
+	margin: 0.35em 0;
+}
+
+.prose strong {
+	color: var(--ink);
+	font-weight: 600;
+}
+
+.prose a {
+	color: var(--ink);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 2px;
+	text-decoration-color: var(--underline);
+}
+
+.prose a:hover {
+	text-decoration-color: var(--ink);
+}
+
+.prose blockquote {
+	margin-inline: 0;
+	padding: 0.1rem 0 0.1rem 1.1rem;
+	border-left: 2px solid var(--line-strong);
+	color: var(--muted);
+}
+
+.prose blockquote > :last-child {
+	margin-bottom: 0;
+}
+
+.prose code {
+	font-family: var(--font-mono);
+	font-size: 0.85em;
+	padding: 0.12em 0.34em;
+	border-radius: 3px;
+	background: var(--hover);
+	color: var(--ink);
+}
+
+.prose pre {
+	position: relative;
+	padding: 1.1rem 1.25rem;
+	border: 1px solid var(--code-border);
+	border-radius: var(--radius);
+	overflow-x: auto;
+	font-size: 0.875rem;
+	line-height: 1.7;
+}
+
+/* 代码块复制按钮：hover 才浮现，触屏常驻 */
+.code-block {
+	position: relative;
+}
+
+.prose .copy-btn {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	z-index: 1;
+	/* 固定最小宽度：Copy / Copied / Failed 切换时按钮不会忽宽忽窄 */
+	min-width: 3.6rem;
+	padding: 0.1rem 0.45rem;
+	border: 1px solid var(--code-border);
+	border-radius: 4px;
+	background: var(--code-bg);
+	color: var(--muted);
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	line-height: 1.7;
+	text-align: center;
+	cursor: pointer;
+	opacity: 0;
+	transition:
+		opacity 150ms var(--ease),
+		color 200ms var(--ease),
+		border-color 200ms var(--ease);
+}
+
+.code-block:hover .copy-btn,
+.prose .copy-btn:focus-visible {
+	opacity: 1;
+}
+
+.prose .copy-btn:hover {
+	color: var(--ink);
+	border-color: var(--line-strong);
+}
+
+@media (hover: none) {
+	.prose .copy-btn {
+		opacity: 1;
+	}
+}
+
+/* 标题锚点：锚点跳转要躲开固定头部，hover 时露出 # */
+.prose h2,
+.prose h3,
+.prose h4 {
+	scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+.prose .anchor {
+	margin-left: 0.35rem;
+	color: var(--muted);
+	font-weight: 400;
+	text-decoration: none;
+	opacity: 0;
+	transition:
+		opacity 150ms var(--ease),
+		color 200ms var(--ease);
+}
+
+.prose .anchor::after {
+	content: '#';
+}
+
+.prose h2:hover .anchor,
+.prose h3:hover .anchor,
+.prose h4:hover .anchor,
+.prose .anchor:focus-visible {
+	opacity: 1;
+}
+
+.prose .anchor:hover {
+	color: var(--ink-strong);
+}
+
+.prose pre code {
+	padding: 0;
+	background: none;
+	font-size: inherit;
+}
+
+/* Shiki 只输出 --shiki-light / --shiki-dark 变量（defaultColor: false），
+   由 data-theme 决定用哪套颜色，不受系统深浅色影响 */
+.prose pre.astro-code {
+	background: var(--code-bg) !important;
+	color: var(--shiki-light);
+}
+
+.prose pre.astro-code span {
+	color: var(--shiki-light);
+}
+
+:root[data-theme='dark'] .prose pre.astro-code {
+	background: var(--code-bg) !important;
+	color: var(--shiki-dark);
+}
+
+:root[data-theme='dark'] .prose pre.astro-code span {
+	color: var(--shiki-dark);
+}
+
+.prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+}
+
+.prose th,
+.prose td {
+	padding: 0.5rem 0.7rem;
+	border-bottom: 1px solid var(--line);
+	text-align: left;
+}
+
+.prose th {
+	color: var(--ink);
+	font-weight: 600;
+}
+
+.prose img {
+	border-radius: var(--radius);
+	cursor: zoom-in;
+}
+
+/* 图片点击放大：用原生 dialog 当灯箱，零依赖 */
+.img-viewer {
+	max-width: 92vw;
+	max-height: 92vh;
+	padding: 0;
+	border: none;
+	background: none;
+	overflow: visible;
+	cursor: zoom-out;
+}
+
+.img-viewer::backdrop {
+	background: rgba(12, 12, 12, 0.82);
+}
+
+.img-viewer img {
+	display: block;
+	max-width: 92vw;
+	max-height: 92vh;
+	border-radius: 4px;
+}
+
+/* ==========================================================================
+   Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}
