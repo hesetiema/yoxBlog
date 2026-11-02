@@ -1,3 +1,5 @@
-allowBuilds:
-  esbuild: set this to true or false
-  sharp: set this to true or false
+# 这里是单包项目，但 Vercel 默认用 pnpm 9 安装：
+# 只要存在 pnpm-workspace.yaml，pnpm 9 就要求必须有 packages 字段，
+# 否则直接报 "packages field missing or empty" 并让 install 失败。
+packages:
+  - '.'

@@ -26,7 +26,10 @@ let reason = '';
 if (!existsSync(outFile)) {
 	reason = '字体文件不存在';
 } else if (!existsSync(charsetFile)) {
-	reason = '没有字符集缓存，无法确认覆盖范围';
+	// CI（Vercel 等）只拉仓库，.cache 不在版本库里，也没有 python 环境：
+	// 字体已经跟着仓库走了，这里没有缓存就跳过校验，别让构建日志刷一堆失败警告
+	console.log('字体子集已随仓库提交，缺少字符集缓存，跳过覆盖率校验');
+	process.exit(0);
 } else {
 	const prev = new Set(readFileSync(charsetFile, 'utf8'));
 	const added = [...next].filter((ch) => !prev.has(ch));
