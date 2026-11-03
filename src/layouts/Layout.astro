@@ -374,7 +374,7 @@ const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font
 	/*
 		fixed 而不是 sticky：sticky 每帧都要按滚动位置重新计算位置、重绘整条 header，
 		快速滚动时文字会跟着抖一下；fixed 的元素交给合成器，滚动过程中完全不参与布局。
-		参考站 tw93.fun 用的也是 fixed。高度固定为 --header-h，body 用同样的 padding-top 让开。
+		高度固定为 --header-h，body 用同样的 padding-top 让开。
 	*/
 	.site-header {
 		position: fixed;
