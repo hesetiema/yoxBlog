@@ -1,0 +1,20 @@
+{
+	"name": "Yoxwu 写作台",
+	"short_name": "写作台",
+	"description": "手机上写文章，提交到 GitHub 后自动部署",
+	"start_url": "/admin",
+	"scope": "/admin",
+	"display": "standalone",
+	"orientation": "portrait",
+	"background_color": "#f5f4ed",
+	"theme_color": "#f5f4ed",
+	"lang": "zh-CN",
+	"icons": [
+		{
+			"src": "/admin-icon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml",
+			"purpose": "any"
+		}
+	]
+}

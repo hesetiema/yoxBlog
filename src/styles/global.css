@@ -293,49 +293,99 @@ hr {
 	line-height: 1.7;
 }
 
-/* 代码块复制按钮：hover 才浮现，触屏常驻 */
+/*
+	代码块统一做成深色卡片（浅色页面里也是深色），参考 tw93.fun 的窗口式代码块：
+	标题栏放三个圆点 + 居中语言名 + 右侧 Copy，代码区配色固定用 Shiki 的 dark 主题。
+	这样不会出现"浅色主题的 token 落在深底上看不清"的问题。
+*/
 .code-block {
-	position: relative;
+	margin: 0 0 1.3em;
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	border-radius: 10px;
+	background: var(--code-surface, #0a0c10);
+	overflow: hidden;
 }
 
-.prose .copy-btn {
+.code-block pre {
+	margin: 0;
+	padding: 1rem 1.15rem;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+}
+
+.code-bar {
+	/* 语言名绝对居中，Copy 靠右；不用 grid 免得多一层嵌套 */
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: 38px;
+	padding: 0 0.75rem 0 0.85rem;
+	background: rgba(255, 255, 255, 0.045);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.code-dots {
+	display: flex;
+	gap: 6px;
+}
+
+.code-dots i {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+/* 三色点取低饱和版本：够辨识，又不至于在纯文字排版里抢注意力 */
+.code-dots i:nth-child(1) {
+	background: #e5615a;
+}
+
+.code-dots i:nth-child(2) {
+	background: #dcae4a;
+}
+
+.code-dots i:nth-child(3) {
+	background: #4f9f5c;
+}
+
+.code-lang {
 	position: absolute;
-	top: 0.5rem;
-	right: 0.5rem;
-	z-index: 1;
-	/* 固定最小宽度：Copy / Copied / Failed 切换时按钮不会忽宽忽窄 */
-	min-width: 3.6rem;
-	padding: 0.1rem 0.45rem;
-	border: 1px solid var(--code-border);
-	border-radius: 4px;
-	background: var(--code-bg);
-	color: var(--muted);
+	left: 50%;
+	transform: translateX(-50%);
+	max-width: 50%;
+	overflow: hidden;
 	font-family: var(--font-mono);
 	font-size: 0.6875rem;
-	line-height: 1.7;
-	text-align: center;
+	letter-spacing: 0.02em;
+	color: rgba(255, 255, 255, 0.4);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+/*
+	Copy 常驻在标题栏右侧：触屏没有 hover，藏起来就等于功能不存在。
+	固定最小宽度，Copy / Copied / Failed 切换时按钮不会忽宽忽窄。
+*/
+.prose .copy-btn {
+	margin-left: auto;
+	min-width: 3.4rem;
+	padding: 0.15rem 0.2rem;
+	border: none;
+	background: none;
+	color: rgba(255, 255, 255, 0.45);
+	font-family: var(--font-mono);
+	font-size: 0.6875rem;
+	line-height: 1.6;
+	text-align: right;
 	cursor: pointer;
-	opacity: 0;
-	transition:
-		opacity 150ms var(--ease),
-		color 200ms var(--ease),
-		border-color 200ms var(--ease);
+	transition: color 160ms var(--ease);
 }
 
-.code-block:hover .copy-btn,
+.prose .copy-btn:hover,
 .prose .copy-btn:focus-visible {
-	opacity: 1;
-}
-
-.prose .copy-btn:hover {
-	color: var(--ink);
-	border-color: var(--line-strong);
-}
-
-@media (hover: none) {
-	.prose .copy-btn {
-		opacity: 1;
-	}
+	color: #ffffff;
 }
 
 /* 标题锚点：锚点跳转要躲开固定头部，hover 时露出 # */
@@ -377,24 +427,23 @@ hr {
 	font-size: inherit;
 }
 
-/* Shiki 只输出 --shiki-light / --shiki-dark 变量（defaultColor: false），
-   由 data-theme 决定用哪套颜色，不受系统深浅色影响 */
+/*
+	Shiki 输出 --shiki-light / --shiki-dark 两套变量（defaultColor: false）。
+	代码块已统一成深色卡片，这里固定取 dark 那套；
+	万一脚本没跑（没包壳），也保留深色底，不至于白底白字。
+*/
 .prose pre.astro-code {
-	background: var(--code-bg) !important;
-	color: var(--shiki-light);
+	background: #0a0c10;
+	color: var(--shiki-dark);
 }
 
 .prose pre.astro-code span {
-	color: var(--shiki-light);
-}
-
-:root[data-theme='dark'] .prose pre.astro-code {
-	background: var(--code-bg) !important;
 	color: var(--shiki-dark);
 }
 
-:root[data-theme='dark'] .prose pre.astro-code span {
-	color: var(--shiki-dark);
+/* 包进深色卡片后底色交给 .code-block，避免两层背景叠色 */
+.code-block pre.astro-code {
+	background: transparent;
 }
 
 .prose table {

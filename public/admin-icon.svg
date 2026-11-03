@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="写作台">
+	<rect width="512" height="512" rx="112" fill="#f5f4ed" />
+	<rect x="132" y="112" width="248" height="288" rx="26" fill="none" stroke="#24292f" stroke-width="22" />
+	<g stroke="#24292f" stroke-width="20" stroke-linecap="round">
+		<path d="M186 196h86" />
+		<path d="M186 260h140" />
+		<path d="M186 324h104" />
+	</g>
+</svg>

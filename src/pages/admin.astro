@@ -1,0 +1,580 @@
+---
+import Editor from '../components/react/Editor';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<!-- viewport-fit=cover：配合 padding 里的 safe-area，刘海屏底部按钮不会被挡住 -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="theme-color" content="#f5f4ed" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#161613" media="(prefers-color-scheme: dark)" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-title" content="写作台" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<link rel="manifest" href="/admin.webmanifest" />
+		<link rel="apple-touch-icon" href="/admin-icon.svg" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>写作台 | Yoxwu</title>
+		<script is:inline>
+			(() => {
+				try {
+					const saved = localStorage.getItem('theme');
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					document.documentElement.dataset.theme =
+						saved === 'light' || saved === 'dark' ? saved : prefersDark ? 'dark' : 'light';
+				} catch {
+					document.documentElement.dataset.theme = 'light';
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<div class="admin-shell">
+			<Editor client:only="react" />
+		</div>
+	</body>
+</html>
+
+<style is:global>
+	/* 写作台自己带一套 token：不复用全局样式，避免正文排版（固定头部、楷体、卡片）干扰编辑体验 */
+	:root {
+		color-scheme: light;
+
+		--bg: #f5f4ed;
+		--surface: #ffffff;
+		--ink: #24292f;
+		--ink-strong: #15141a;
+		--ink-soft: rgba(36, 41, 47, 0.86);
+		--muted: rgba(36, 41, 47, 0.5);
+		--line: #e6e3d9;
+		--line-strong: #d6d2c5;
+		--hover: rgba(36, 41, 47, 0.05);
+		--code-bg: #ffffff;
+		--danger: #b3372c;
+
+		--radius: 10px;
+		--ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+		--font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+		--font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+	}
+
+	:root[data-theme='dark'] {
+		color-scheme: dark;
+
+		--bg: #161613;
+		--surface: #1e1e1b;
+		--ink: #eae7df;
+		--ink-strong: #ffffff;
+		--ink-soft: rgba(234, 231, 223, 0.86);
+		--muted: rgba(234, 231, 223, 0.46);
+		--line: #2d2c28;
+		--line-strong: #413f39;
+		--hover: rgba(255, 255, 255, 0.06);
+		--code-bg: #171613;
+		--danger: #ef8079;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		margin: 0;
+		min-height: 100dvh;
+		background: var(--bg);
+		color: var(--ink-soft);
+		font-family: var(--font-ui);
+		font-size: 1rem;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	button {
+		font: inherit;
+		color: inherit;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--ink);
+		outline-offset: 2px;
+	}
+
+	.admin-shell {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: 720px;
+		min-height: 100dvh;
+		margin: 0 auto;
+		/* 顶部对齐状态栏、底部避开手势条 */
+		padding: max(0px, env(safe-area-inset-top)) 0 max(0px, env(safe-area-inset-bottom));
+	}
+
+	/* ===== 顶栏 ===== */
+
+	.admin-bar {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.6rem clamp(0.85rem, 3vw, 1.25rem);
+		border-bottom: 1px solid var(--line);
+		background: var(--bg);
+	}
+
+	.admin-bar-info {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		min-width: 0;
+	}
+
+	.admin-brand {
+		color: var(--ink-strong);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		white-space: nowrap;
+	}
+
+	.admin-count {
+		color: var(--muted);
+		font-size: 0.8125rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.admin-bar-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	/* ===== 按钮 ===== */
+
+	.admin-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.35rem;
+		min-height: 36px;
+		padding: 0 0.9rem;
+		border: 1px solid var(--line-strong);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--ink);
+		font-size: 0.9375rem;
+		white-space: nowrap;
+		cursor: pointer;
+		transition:
+			background 160ms var(--ease),
+			opacity 160ms var(--ease);
+	}
+
+	.admin-btn:hover {
+		background: var(--hover);
+	}
+
+	.admin-btn:disabled {
+		cursor: default;
+		opacity: 0.55;
+	}
+
+	.admin-btn-primary {
+		border-color: transparent;
+		background: var(--ink);
+		color: var(--bg);
+		font-weight: 600;
+	}
+
+	.admin-btn-primary:hover {
+		background: var(--ink-strong);
+	}
+
+	.admin-btn-ghost {
+		border-color: transparent;
+		background: transparent;
+		color: var(--ink-soft);
+	}
+
+	.admin-btn-ghost:hover {
+		background: var(--hover);
+	}
+
+	.admin-link {
+		padding: 0;
+		border: none;
+		background: none;
+		color: var(--muted);
+		font-size: 0.8125rem;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		cursor: pointer;
+	}
+
+	/* ===== 正文编辑区 ===== */
+
+	.admin-main {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		padding: 0.9rem clamp(0.85rem, 3vw, 1.25rem) 1.5rem;
+	}
+
+	/* 16px 起步：iOS 上小于 16px 的输入框聚焦时会被强制放大 */
+	.admin-title,
+	.admin-body,
+	.admin-field input,
+	.admin-field textarea,
+	.admin-input {
+		width: 100%;
+		border: none;
+		border-radius: 0;
+		background: transparent;
+		color: var(--ink-strong);
+		font-family: inherit;
+		font-size: 1rem;
+		line-height: 1.7;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	.admin-title:focus,
+	.admin-body:focus,
+	.admin-field input:focus,
+	.admin-field textarea:focus,
+	.admin-input:focus {
+		outline: none;
+	}
+
+	.admin-title {
+		padding: 0 0 0.5rem;
+		font-size: 1.375rem;
+		font-weight: 700;
+		line-height: 1.35;
+	}
+
+	.admin-title::placeholder,
+	.admin-body::placeholder,
+	.admin-input::placeholder {
+		color: var(--muted);
+	}
+
+	.admin-body {
+		flex: 1 1 auto;
+		min-height: 240px;
+		margin-top: 0.5rem;
+		padding: 0;
+		resize: none;
+		overflow: hidden;
+	}
+
+	.admin-chips {
+		display: flex;
+		gap: 0.45rem;
+		padding: 0.15rem 0 0.65rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.admin-chip {
+		padding: 0.2rem 0.7rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: transparent;
+		color: var(--muted);
+		font-size: 0.8125rem;
+		cursor: pointer;
+		transition:
+			color 160ms var(--ease),
+			border-color 160ms var(--ease),
+			background 160ms var(--ease);
+	}
+
+	.admin-chip[aria-pressed='true'] {
+		border-color: var(--ink);
+		background: var(--ink);
+		color: var(--bg);
+	}
+
+	/* ===== 更多设置 ===== */
+
+	.admin-advanced {
+		margin-top: 0.75rem;
+		padding: 0.6rem 0.75rem;
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		background: var(--surface);
+	}
+
+	.admin-advanced > summary {
+		color: var(--muted);
+		font-size: 0.8125rem;
+		cursor: pointer;
+	}
+
+	.admin-field {
+		display: block;
+		margin-top: 0.75rem;
+	}
+
+	.admin-field > span {
+		display: block;
+		margin-bottom: 0.25rem;
+		color: var(--muted);
+		font-size: 0.75rem;
+	}
+
+	.admin-field input,
+	.admin-field textarea {
+		padding: 0.4rem 0.55rem;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		background: var(--bg);
+		font-size: 0.9375rem;
+		resize: vertical;
+	}
+
+	.admin-note {
+		display: block;
+		margin-top: 0.3rem;
+		color: var(--muted);
+		font-size: 0.75rem;
+	}
+
+	.admin-switch {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin-top: 0.9rem;
+		color: var(--ink-soft);
+		font-size: 0.8125rem;
+	}
+
+	.admin-switch input {
+		width: 16px;
+		height: 16px;
+		accent-color: var(--ink);
+	}
+
+	/* ===== 提示 ===== */
+
+	.admin-toast {
+		position: sticky;
+		top: 54px;
+		z-index: 19;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin: 0.6rem clamp(0.85rem, 3vw, 1.25rem) 0;
+		padding: 0.55rem 0.75rem;
+		border: 1px solid var(--danger);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--danger);
+		font-size: 0.875rem;
+	}
+
+	.admin-toast button {
+		border: none;
+		background: none;
+		color: inherit;
+		font-size: 1.1rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.admin-error {
+		margin: 0.75rem 0 0;
+		color: var(--danger);
+		font-size: 0.875rem;
+	}
+
+	.admin-hint {
+		color: var(--muted);
+		font-size: 0.875rem;
+	}
+
+	/* ===== 登录 / 结果卡 ===== */
+
+	.admin-lock,
+	.admin-result {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex: 1 1 auto;
+		gap: 0.5rem;
+		padding: 12vh clamp(1.1rem, 5vw, 1.75rem) 2rem;
+	}
+
+	.admin-lock-title,
+	.admin-result-title {
+		margin: 0;
+		color: var(--ink-strong);
+		font-size: 1.5rem;
+		font-weight: 700;
+		word-break: break-all;
+	}
+
+	.admin-lock-form {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.75rem;
+	}
+
+	.admin-input {
+		flex: 1 1 auto;
+		padding: 0.6rem 0.75rem;
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius);
+		background: var(--surface);
+	}
+
+	.admin-result-badge {
+		align-self: flex-start;
+		margin: 0;
+		padding: 0.15rem 0.6rem;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bg);
+		font-size: 0.75rem;
+	}
+
+	.admin-result-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.75rem;
+	}
+
+	.admin-result .admin-btn-ghost {
+		align-self: flex-start;
+		margin-top: 0.5rem;
+	}
+
+	/* ===== 预览 ===== */
+
+	.admin-prose {
+		color: var(--ink-soft);
+		font-size: 1.0625rem;
+		line-height: 1.75;
+	}
+
+	.admin-prose > :first-child {
+		margin-top: 0;
+	}
+
+	.admin-prose h1,
+	.admin-prose h2,
+	.admin-prose h3,
+	.admin-prose h4 {
+		color: var(--ink-strong);
+		font-weight: 700;
+		line-height: 1.35;
+	}
+
+	.admin-prose h1 {
+		font-size: 1.5rem;
+	}
+
+	.admin-prose h2 {
+		margin: 1.8em 0 0.6em;
+		font-size: 1.25rem;
+	}
+
+	.admin-prose h3 {
+		margin: 1.5em 0 0.5em;
+		font-size: 1.0625rem;
+	}
+
+	.admin-prose p {
+		margin: 0 0 1em;
+		text-wrap: pretty;
+	}
+
+	.admin-prose a {
+		color: var(--ink-strong);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.admin-prose ul,
+	.admin-prose ol {
+		margin: 0 0 1em;
+		padding-left: 1.4em;
+	}
+
+	.admin-prose li + li {
+		margin-top: 0.3em;
+	}
+
+	.admin-prose blockquote {
+		margin: 0 0 1em;
+		padding: 0.2em 0 0.2em 0.9em;
+		border-left: 3px solid var(--line-strong);
+		color: var(--muted);
+	}
+
+	.admin-prose code {
+		padding: 0.1em 0.35em;
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		background: var(--code-bg);
+		font-family: var(--font-mono);
+		font-size: 0.875em;
+	}
+
+	/* 预览里的代码块和正文保持一致：深色卡片 */
+	.admin-prose pre {
+		margin: 0 0 1em;
+		padding: 1rem 1.15rem;
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 10px;
+		background: #0a0c10;
+		color: rgba(255, 255, 255, 0.86);
+		overflow-x: auto;
+	}
+
+	.admin-prose pre code {
+		padding: 0;
+		border: none;
+		background: none;
+		color: inherit;
+		font-size: 0.8125rem;
+		line-height: 1.65;
+	}
+
+	.admin-prose img {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--radius);
+	}
+
+	.admin-prose hr {
+		margin: 1.6em 0;
+		border: none;
+		border-top: 1px solid var(--line);
+	}
+
+	/* ===== 底栏 ===== */
+
+	.admin-foot {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.75rem clamp(0.85rem, 3vw, 1.25rem) 1rem;
+		color: var(--muted);
+		font-size: 0.75rem;
+	}
+</style>

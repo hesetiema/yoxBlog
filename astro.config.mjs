@@ -9,8 +9,10 @@ import solidJs from "@astrojs/solid-js";
 
 import sitemap from "@astrojs/sitemap";
 
+import vercel from "@astrojs/vercel";
+
 /** 站点根地址：canonical、og:url、RSS、sitemap 都基于它，换成真实域名即可 */
-const SITE = "https://yoxwu.com";
+const SITE = "https://wuyox.vercel.app";
 
 // https://astro.build/config
 export default defineConfig({
@@ -35,15 +37,21 @@ export default defineConfig({
   // No `include` is needed if you are only using a single JSX framework!
   integrations: [
     vue(),
+    // 两个 JSX 集成必须互相 exclude：tsconfig 的 jsxImportSource 是 solid-js，
+    // 不划清边界时 React 组件会被 Solid 的 babel 插件接管，报 Missing export "jsx"
     react({
       include: ["**/react/*"],
+      exclude: ["**/solid/**"],
     }),
     solidJs({
       include: ["**/solid/*"],
+      exclude: ["**/react/**"],
     }),
     sitemap({
-      // 草稿不会生成页面，这里只是保险起见
-      filter: (page) => !page.includes("/draft/"),
+      // 草稿不会生成页面，这里只是保险起见；写作台不进 sitemap
+      filter: (page) => !page.includes("/draft/") && !page.includes("/admin"),
     }),
   ],
+  // 整站仍是静态预渲染，只有 /admin 用到的两个接口按需执行（prerender = false）
+  adapter: vercel(),
 });

@@ -9,7 +9,7 @@ export const GET: APIRoute = async (context) => {
 	return rss({
 		title: 'Yoxwu 的博客',
 		description: '记录技术、生活，和一些想明白的事。',
-		site: context.site ?? 'https://yoxwu.com',
+		site: context.site ?? 'https://wuyox.vercel.app',
 		items: posts.map((post) => ({
 			title: post.data.title,
 			description: post.data.description,

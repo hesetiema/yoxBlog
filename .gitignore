@@ -29,3 +29,9 @@ pnpm-debug.log*
 
 # 字体子集化缓存（源字体 + 字符集）
 .cache/
+
+# Vercel 构建产物（接入 @astrojs/vercel 后生成）
+.vercel/
+
+# 本地 dev server 日志
+dev.log

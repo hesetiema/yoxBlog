@@ -22,7 +22,7 @@ const {
 } = Astro.props;
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const canonical = new URL(path, Astro.site ?? 'https://yoxwu.com').href;
+const canonical = new URL(path, Astro.site ?? 'https://wuyox.vercel.app').href;
 
 const navItems = [
 	{ label: '技术', href: '/category/tech' },
@@ -79,7 +79,7 @@ const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
-		<link rel="alternate" type="application/rss+xml" title="Yoxwu 的博客" href={new URL('/rss.xml', Astro.site ?? 'https://yoxwu.com')} />
+		<link rel="alternate" type="application/rss+xml" title="Yoxwu 的博客" href={new URL('/rss.xml', Astro.site ?? 'https://wuyox.vercel.app')} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content={publishedTime ? 'article' : 'website'} />
@@ -169,7 +169,7 @@ const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font
 
 		<script is:inline>
 			(() => {
-				/* 代码块复制按钮：文案统一英文 */
+				/* 代码块：套一层 mac 风格的标题栏，语言名居中、Copy 常驻右侧 */
 				const copyLabel = (button, text) => {
 					button.textContent = text;
 					setTimeout(() => {
@@ -177,14 +177,35 @@ const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font
 					}, 1600);
 				};
 
+				/** Shiki 把语言写在 pre[data-language]，兜底再从 code.language-xxx 里取 */
+				const readLang = (pre) => {
+					const fromAttr = pre.dataset.language?.trim();
+					if (fromAttr) return fromAttr;
+					const match = pre.querySelector('code')?.className.match(/language-([\w+#.-]+)/);
+					return match?.[1] ?? 'text';
+				};
+
 				document.querySelectorAll('.prose pre').forEach((pre) => {
-					// 包一层，按钮才不会跟着代码的横向滚动跑掉
+					// 已经包过就跳过，避免热更新后重复套壳
 					if (pre.parentElement?.classList.contains('code-block')) return;
+
+					const bar = document.createElement('div');
+					bar.className = 'code-bar';
+
+					const dots = document.createElement('span');
+					dots.className = 'code-dots';
+					dots.setAttribute('aria-hidden', 'true');
+					for (let index = 0; index < 3; index += 1) dots.appendChild(document.createElement('i'));
+
+					const label = document.createElement('span');
+					label.className = 'code-lang';
+					label.textContent = readLang(pre);
 
 					const button = document.createElement('button');
 					button.type = 'button';
 					button.className = 'copy-btn';
 					button.textContent = 'Copy';
+					button.setAttribute('aria-label', '复制代码');
 					button.addEventListener('click', async () => {
 						const text = pre.querySelector('code')?.innerText ?? pre.innerText;
 						try {
@@ -195,11 +216,16 @@ const fontFaceCss = `@font-face{font-family:'LXGW WenKai';font-style:normal;font
 						}
 					});
 
+					bar.append(dots, label, button);
+
 					const wrapper = document.createElement('div');
 					wrapper.className = 'code-block';
+					// 代码底色跟着 Shiki 的深色主题走（变量在 pre 上，父层取不到，搬一次）
+					const darkBg = pre.style.getPropertyValue('--shiki-dark-bg').trim();
+					if (darkBg) wrapper.style.setProperty('--code-surface', darkBg);
+
 					pre.parentNode.insertBefore(wrapper, pre);
-					wrapper.appendChild(pre);
-					wrapper.appendChild(button);
+					wrapper.append(bar, pre);
 				});
 
 				/* 标题锚点：hover 时出现一个 #，方便分享某一节 */
