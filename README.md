@@ -47,6 +47,7 @@ pnpm check:font # 只检查当前字体是否覆盖全站用字
 ├── public/
 │   ├── fonts/                   # 霞鹜文楷子集，构建时生成并随仓库提交
 │   ├── admin.webmanifest        # 写作台的 PWA 清单（可添加到主屏）
+│   ├── icons/                   # 主屏图标：192 / 512 / maskable / apple-touch
 │   ├── admin-icon.svg
 │   └── favicon.ico / favicon.svg
 ├── scripts/
